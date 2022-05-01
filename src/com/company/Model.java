@@ -103,6 +103,11 @@ public class Model extends JPanel implements ActionListener {
             screenData[i] = levelData[i];
         }
     }
+
+    private void playGame(Graphics2D g2d){
+
+    }
+
     private void continueLevel() {
 
         int dx = 1;
@@ -131,6 +136,22 @@ public class Model extends JPanel implements ActionListener {
         req_dx = 0;		//reset sterowania kierunkiem
         req_dy = 0;
         isDead = false;
+    }
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0,0,d.width, d.height);
+
+        drawMaze(g2d);
+        drawScore(g2d);
+        if(inGame){
+            playGame(g2d);
+        }else{
+            showIntroScreen(g2d);
+        }
     }
 
      class TAdapter extends KeyAdapter{ // funkcja do kontroli postacia
