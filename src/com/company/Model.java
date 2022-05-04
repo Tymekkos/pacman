@@ -105,7 +105,47 @@ public class Model extends JPanel implements ActionListener {
     }
 
     private void playGame(Graphics2D g2d){
+        if(isDead){
+            death();
+        }else{
+            movePacman();
+            drawPacman(g2d);
+            moveGhosts(g2d);
+            checkMaze();
+        }
+    }
 
+    public void movePacman(){
+        int pos;
+        short ch;
+
+        if(pacman_x % BLOCK_SIZE == 0 && pacman_y % BLOCK_SIZE == 0){
+            pos = pacman_x / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE)
+                    ch = screenData[pos];
+            if((ch & 16)!=0){
+                screenData[pos] = (short) (ch&15);
+                score++;
+            }
+            if (req_dx != 0 || req_dy != 0) {
+                if (!((req_dx == -1 && req_dy == 0 && (ch & 1) != 0)
+                        || (req_dx == 1 && req_dy == 0 && (ch & 4) != 0)
+                        || (req_dx == 0 && req_dy == -1 && (ch & 2) != 0)
+                        || (req_dx == 0 && req_dy == 1 && (ch & 8) != 0))) {
+                    pacman_dx = req_dx;
+                    pacman_dy = req_dy;
+                }
+            }
+            // Check for standstill
+            if ((pacman_dx == -1 && pacman_dy == 0 && (ch & 1) != 0)
+                    || (pacman_dx == 1 && pacman_dy == 0 && (ch & 4) != 0)
+                    || (pacman_dx == 0 && pacman_dy == -1 && (ch & 2) != 0)
+                    || (pacman_dx == 0 && pacman_dy == 1 && (ch & 8) != 0)) {
+                pacman_dx = 0;
+                pacman_dy = 0;
+            }
+        }
+        pacman_x = pacman_x + PACMAN_SPEED * pacman_dx;
+        pacman_y = pacman_y + PACMAN_SPEED * pacman_dy;
     }
 
     private void continueLevel() {
@@ -152,6 +192,7 @@ public class Model extends JPanel implements ActionListener {
         }else{
             showIntroScreen(g2d);
         }
+        Toolkit.getDefaultToolkit().sync();
     }
 
      class TAdapter extends KeyAdapter{ // funkcja do kontroli postacia
