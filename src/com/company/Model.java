@@ -120,7 +120,7 @@ public class Model extends JPanel implements ActionListener {
         short ch;
 
         if(pacman_x % BLOCK_SIZE == 0 && pacman_y % BLOCK_SIZE == 0){
-            pos = pacman_x / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE)
+            pos = pacman_x / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE);
                     ch = screenData[pos];
             if((ch & 16)!=0){
                 screenData[pos] = (short) (ch&15);
@@ -135,7 +135,7 @@ public class Model extends JPanel implements ActionListener {
                     pacman_dy = req_dy;
                 }
             }
-            // Check for standstill
+            // sprawdzamy czy stoi w miejscu
             if ((pacman_dx == -1 && pacman_dy == 0 && (ch & 1) != 0)
                     || (pacman_dx == 1 && pacman_dy == 0 && (ch & 4) != 0)
                     || (pacman_dx == 0 && pacman_dy == -1 && (ch & 2) != 0)
@@ -146,6 +146,73 @@ public class Model extends JPanel implements ActionListener {
         }
         pacman_x = pacman_x + PACMAN_SPEED * pacman_dx;
         pacman_y = pacman_y + PACMAN_SPEED * pacman_dy;
+    }
+
+    public void drawPacman(Graphics2D g2d){
+        if(req_dx == -1){
+            g2d.drawImage(left, pacman_x+1, pacman_y+1, this);
+        }else if(req_dx == 1){
+            g2d.drawImage(right, pacman_x+1, pacman_y+1, this);
+        }else if(req_dy == -1){
+            g2d.drawImage(up, pacman_x+1, pacman_y+1, this);
+        }else{
+            g2d.drawImage(down, pacman_x+1, pacman_y+1, this);
+        }
+    }
+
+    public void MoveGhosts(Graphics2D g2d){
+        int pos;
+        int count;
+        for(int i=0; i<N_GHOSTS; i++){
+            if(ghost_x[i]%BLOCK_SIZE == 0 && ghost_y[i]%BLOCK_SIZE == 0){
+                pos = ghost_x[i] / BLOCK_SIZE + N_BLOCKS * (int) (ghost_y[i] / BLOCK_SIZE);
+
+                count = 0;
+                if ((screenData[pos] & 1) == 0 && ghost_dx[i] != 1) {
+                    dx[count] = -1;
+                    dy[count] = 0;
+                    count++;
+                }
+                if ((screenData[pos] & 2) == 0 && ghost_dx[i] != 1) {
+                    dx[count] = 0;
+                    dy[count] = -1;
+                    count++;
+                }
+                if ((screenData[pos] & 4) == 0 && ghost_dx[i] != 1) {
+                    dx[count] = 1;
+                    dy[count] = 0;
+                    count++;
+                }
+                if ((screenData[pos] & 8) == 0 && ghost_dx[i] != 1) {
+                    dx[count] = 0;
+                    dy[count] = 1;
+                    count++;
+                }
+
+                if (count == 0) {
+
+                    if ((screenData[pos] & 15) == 15) {
+                        ghost_dx[i] = 0;
+                        ghost_dy[i] = 0;
+                    } else {
+                        ghost_dx[i] = -ghost_dx[i];
+                        ghost_dy[i] = -ghost_dy[i];
+                    }
+
+                } else {
+
+                    count = (int) (Math.random() * count);
+
+                    if (count > 3) {
+                        count = 3;
+                    }
+
+                    ghost_dx[i] = dx[count];
+                    ghost_dy[i] = dy[count];
+                }
+
+            }
+        }
     }
 
     private void continueLevel() {
